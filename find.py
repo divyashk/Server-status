@@ -2,19 +2,44 @@ import os
 import re
 import datetime
 
+# storing the present time and date
 datetime_now = datetime.datetime.now()
 month = datetime_now.strftime("%b")
 day = datetime_now.strftime("%d")
 year = datetime_now.strftime("%Y")
 date_comp = day+"/"+month+"/"+year
 
-import os
+
+
+# checking for ongoing services
+
+  # first for openvpn
+os.system('service openvpn status > services-status')
+
+with open('services-status','a') as f_write:              # just to seperate the them :)
+    f_write.write("\n\n\n\n\n")
+
+os.system('service network-manager status >> services-status')
+
+# You can add more services here that feel like monitoring
+#
+# with open('services-status','a') as f_write:             
+#     f_write.write("\n\n\n")
+
+# os.system('service <your service name here> status >> services-status')
+# note- do check in your terminal whether the name is correct by entering the same command($service <your service name here> status)
+
+
+
+
+
+
 
 
 # # creating nginx-access file report 
 # with open('/var/log/nginx/access.log', 'r', encoding='utf-8') as read_file:
 #     lines = read_file.readlines()
-#     with open('access-report', 'w') as f_write:
+#     with open('nginx-access-report', 'w') as f_write:
 #       f_write.write("Important HTTP\HTTPS access till {}\n\n".format(datetime_now.strftime("%c")))
 #       f_write.write('{0:5}\t{1:28}\t{2:20}\t{3:10}\t{4:20}\t{5:50}\n\n'.format("Status","Request","IP","Time","Date","Detail"))
       
