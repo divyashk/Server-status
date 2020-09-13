@@ -38,12 +38,17 @@ msg.attach(MIMEText(body,'plain'))
 # checking for specific services
 
   # first for openvpn
-os.system('service openvpnjkgk status > services-status')
+os.system('service openvpn status > services-status')
 
 with open('services-status','a') as f_write:              
-    f_write.write("\n\n\n\n\n")
+    f_write.write("\n\n\n")
 
 os.system('service network-manager status >> services-status')
+
+with open('services-status','a') as f_write:              
+    f_write.write("\n\n\n")
+
+os.system('service app status >> services-status')
 
 # You can add more services here that you feel like monitoring
 # with open('services-status','a') as f_write:             
