@@ -17,7 +17,7 @@ date_comp = day+"/"+month+"/"+year
 
 # configuring email
 
-email_send = os.environ.get('SEND_EMAIL')                                 
+email_send = os.environ.get('SEND_EMAIL')                                     # you need create environment variable with the same name on your machine to store the sender, receiver and password.
 email_user = os.environ.get('MY_EMAIL')
 email_password = os.environ.get('MY_PASSWORD')
 
@@ -29,41 +29,33 @@ msg['To'] = email_send
 msg['Subject'] = subject
 
 body = 'Please find the attached copies of your server reports'
-
 msg.attach(MIMEText(body,'plain'))
 
 
-
-
-# checking for specific services
-
-  # first for openvpn
-os.system('service openvpn status > services-status')
-
-with open('services-status','a') as f_write:              
-    f_write.write("\n\n\n")
-
-os.system('service network-manager status >> services-status')
-
-with open('services-status','a') as f_write:              
-    f_write.write("\n\n\n")
-
-os.system('service app status >> services-status')
-
-# You can add more services here that you feel like monitoring
-# with open('services-status','a') as f_write:             
-#     f_write.write("\n\n\n")
-# os.system('service <your service name here> status >> services-status')
-# note- do check in your terminal whether the name is correct by entering the same command($service <your service name here> status)
+#################################### CHECKING THE STATUS OF SPECIFIC SERVICES ##############################################################################################
+service_exist_count = 0;
+lis_services = ["app", "cron", "sshd"]              # You can add and remove service here.
+for serv in lis_services:
+  if os.path.exists("/lib/systemd/system/"+serv+".service"):
+    service_exist_count+=1;
+    with open('services-status','a') as f_write:              
+      f_write.write("STATUS OF {}\n\n\n")
+      os.system('service {} status >> services-status'.format(serv))
+      f_write.write("STATUS OF {}\n\n\n")
+  else:
+    print("Service {} doesn't exist".format(serv));
 
 #attaching the generated file to mail
-filename='services-status'
-attachment  =open(filename,'rb')
-part = MIMEBase('application','octet-stream')
-part.set_payload((attachment).read())
-encoders.encode_base64(part)
-part.add_header('Content-Disposition',"attachment; filename= "+filename)
-msg.attach(part)
+if service_exist_count > 0:
+  filename='services-status'
+  attachment  =open(filename,'rb')
+  part = MIMEBase('application','octet-stream')
+  part.set_payload((attachment).read())
+  encoders.encode_base64(part)
+  part.add_header('Content-Disposition',"attachment; filename= "+filename)
+  msg.attach(part)
+
+################################################ NOW READING LOGS ###########################################################################################
 
 
 # NOTE - this part will run only if you are using Nginx instead of Apache
@@ -193,13 +185,13 @@ else:
   print("Faillog file not found, so moving on...")
 
     
-# Sending the email
+##################################################### SENDING THE MAIL #######################################################################
 
 text = msg.as_string()
 server = smtplib.SMTP('smtp.gmail.com',587)
 server.starttls()
 server.login(email_user,email_password)
-
-
 server.sendmail(email_user,email_send,text)
 server.quit()
+
+print("\n\nMAIL SENT TO {}".format(email_send))
