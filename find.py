@@ -37,11 +37,17 @@ service_exist_count = 0;
 lis_services = ["app", "cron", "sshd"]              # You can add and remove service here.
 for serv in lis_services:
   if os.path.exists("/lib/systemd/system/"+serv+".service"):
-    service_exist_count+=1;
+    service_exist_count += 1;
+    
+    # opening the file to write
     with open('services-status','a') as f_write:              
-      f_write.write("STATUS OF {}\n\n\n")
-      os.system('service {} status >> services-status'.format(serv))
-      f_write.write("STATUS OF {}\n\n\n")
+      
+      if service_exist_count == 1:
+        os.system('service {} status > services-status'.format(serv))
+      else:
+        os.system('service {} status >> services-status'.format(serv))
+      f_write.write("\n\n\n")
+
   else:
     print("Service {} doesn't exist".format(serv));
 
