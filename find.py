@@ -36,7 +36,7 @@ msg.attach(MIMEText(body,'plain'))
 service_exist_count = 0;
 lis_services = ["app", "cron", "sshd"]              # You can add and remove service here.
 for serv in lis_services:
-  if os.path.exists("/lib/systemd/system/"+serv+".service"):
+  if os.path.exists("/lib/systemd/system/"+serv+".service") or os.path.exists("/etc/systemd/system/"+serv+".service") :
     service_exist_count += 1;
     
     # opening the file to write
